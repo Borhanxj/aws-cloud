@@ -88,8 +88,7 @@
                       <button class="button secondary" type="submit">Unban</button>
                     </form>
                   <% } else { %>
-                    <form class="inline-reason-form" action="/admin/users/<%= user.id %>/ban" method="POST">
-                      <input name="reason" placeholder="reason">
+                    <form action="/admin/users/<%= user.id %>/ban" method="POST">
                       <button class="button danger" type="submit" <%= user.id === currentUser.id ? "disabled" : "" %>>Ban</button>
                     </form>
                   <% } %>
