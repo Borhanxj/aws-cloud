@@ -11,6 +11,10 @@ const {
 const router = express.Router();
 const upload = createUploadMiddleware();
 
+function wantsJson(req) {
+  return req.get("X-Requested-With") === "fetch" || req.accepts(["json", "html"]) === "json";
+}
+
 router.post(
   "/channels/:channelId/messages",
   requireAuth,
@@ -24,6 +28,12 @@ router.post(
       const content = String(req.body.content || "").trim();
 
       if (!content && !req.file) {
+        if (wantsJson(req)) {
+          return res.status(400).json({
+            message: "Write a message or attach a file."
+          });
+        }
+
         req.flash("error", "Write a message or attach a file.");
         return res.redirect(`/channels/${channelId}`);
       }
@@ -78,6 +88,14 @@ router.post(
       );
 
       await client.query("COMMIT");
+
+      if (wantsJson(req)) {
+        return res.json({
+          ok: true,
+          channelId
+        });
+      }
+
       res.redirect(`/channels/${channelId}`);
     } catch (error) {
       await client.query("ROLLBACK");

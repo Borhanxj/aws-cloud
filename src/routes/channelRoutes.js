@@ -145,6 +145,29 @@ router.get("/channels/:channelId", requireAuth, async (req, res, next) => {
   }
 });
 
+router.get("/channels/:channelId/messages.json", requireAuth, async (req, res, next) => {
+  try {
+    const channelId = Number(req.params.channelId);
+    const selectedChannel = await getChannel(channelId);
+
+    if (!selectedChannel) {
+      return res.status(404).json({
+        message: "Channel not found."
+      });
+    }
+
+    const messages = await getMessages(channelId);
+
+    res.json({
+      messages,
+      count: messages.length,
+      currentUserId: req.currentUser.id
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.post("/channels", requireAuth, async (req, res, next) => {
   try {
     const name = slugifyChannelName(req.body.name);

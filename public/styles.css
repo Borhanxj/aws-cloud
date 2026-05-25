@@ -85,6 +85,12 @@ textarea {
   transform: translateY(-1px);
 }
 
+.button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+  transform: none;
+}
+
 .button.primary {
   background: var(--accent);
   color: white;
@@ -562,6 +568,66 @@ textarea {
   border-top: 1px solid var(--line);
   background: #202127;
   padding: 16px 26px;
+}
+
+.attachment-preview {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: 76px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #17181d;
+  padding: 10px;
+}
+
+.attachment-preview[hidden] {
+  display: none;
+}
+
+.preview-media {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 58px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #101116;
+}
+
+.preview-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.file-preview-icon {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  color: #bac2ff;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.preview-meta {
+  min-width: 0;
+}
+
+.preview-meta strong,
+.preview-meta span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preview-meta span {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 4px;
 }
 
 .composer textarea {

@@ -1,7 +1,6 @@
 <div class="app-shell">
   <nav class="server-rail" aria-label="Server navigation">
     <a class="server-badge active" href="/">CC</a>
-    <a class="server-badge quiet" href="/health" title="Health check">OK</a>
   </nav>
 
   <aside class="channel-sidebar">
@@ -61,11 +60,17 @@
         </div>
         <div class="header-stat">
           <span>Messages</span>
-          <strong><%= messages.length %></strong>
+          <strong data-message-count><%= messages.length %></strong>
         </div>
       </header>
 
-      <section class="message-list" aria-label="Messages">
+      <section
+        class="message-list"
+        aria-label="Messages"
+        data-message-list
+        data-channel-id="<%= selectedChannel.id %>"
+        data-current-user-id="<%= currentUser.id %>"
+      >
         <% if (messages.length === 0) { %>
           <div class="empty-chat">
             <div class="brand-mark">#</div>
@@ -126,7 +131,8 @@
         <% }) %>
       </section>
 
-      <form class="composer" action="/channels/<%= selectedChannel.id %>/messages" method="POST" enctype="multipart/form-data">
+      <form class="composer" action="/channels/<%= selectedChannel.id %>/messages" method="POST" enctype="multipart/form-data" data-composer>
+        <div class="attachment-preview" data-attachment-preview hidden></div>
         <textarea name="content" placeholder="Message #<%= selectedChannel.name %>"></textarea>
         <label class="file-picker">
           <input type="file" name="attachment">

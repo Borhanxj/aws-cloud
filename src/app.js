@@ -97,14 +97,33 @@ app.use((req, res) => {
 app.use((error, req, res, next) => {
   console.error(error);
 
+  const wantsJson =
+    req.get("X-Requested-With") === "fetch" ||
+    req.accepts(["json", "html"]) === "json";
+
   if (error instanceof multer.MulterError) {
+    const message =
+      error.code === "LIMIT_FILE_SIZE"
+        ? `File is too large. Max upload is ${maxUploadMb} MB.`
+        : "Upload failed. Try a different file.";
+
+    if (wantsJson) {
+      return res.status(400).json({ message });
+    }
+
     if (error.code === "LIMIT_FILE_SIZE") {
-      req.flash("error", `File is too large. Max upload is ${maxUploadMb} MB.`);
+      req.flash("error", message);
       return res.redirect(req.get("Referrer") || "/");
     }
 
-    req.flash("error", "Upload failed. Try a different file.");
+    req.flash("error", message);
     return res.redirect(req.get("Referrer") || "/");
+  }
+
+  if (wantsJson) {
+    return res.status(500).json({
+      message: "Application error. Try again."
+    });
   }
 
   res.status(500).render("layout", {

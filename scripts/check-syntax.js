@@ -3,7 +3,7 @@ const path = require("path");
 const { spawnSync } = require("child_process");
 
 const root = path.join(__dirname, "..");
-const targets = ["server.js", "src", "scripts"];
+const targets = ["server.js", "src", "scripts", "public"];
 
 function collectJavaScriptFiles(entry) {
   const fullPath = path.join(root, entry);
