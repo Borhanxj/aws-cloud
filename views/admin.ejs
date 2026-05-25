@@ -1,0 +1,162 @@
+<main class="admin-shell">
+  <header class="admin-header">
+    <div>
+      <p class="eyebrow">Admin Console</p>
+      <h1>CloudChat Moderation</h1>
+      <p>Manage members, channels, bans, and recent messages.</p>
+    </div>
+    <a class="button secondary" href="/">Back to Chat</a>
+  </header>
+
+  <section class="admin-stats">
+    <div>
+      <span>Users</span>
+      <strong><%= stats.user_count %></strong>
+    </div>
+    <div>
+      <span>Banned</span>
+      <strong><%= stats.banned_count %></strong>
+    </div>
+    <div>
+      <span>Channels</span>
+      <strong><%= stats.channel_count %></strong>
+    </div>
+    <div>
+      <span>Messages</span>
+      <strong><%= stats.message_count %></strong>
+    </div>
+  </section>
+
+  <section class="admin-section">
+    <div class="admin-section-head">
+      <div>
+        <p class="eyebrow">Members</p>
+        <h2>Users</h2>
+      </div>
+    </div>
+
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Messages</th>
+            <th>Last Seen</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.forEach((user) => { %>
+            <tr>
+              <td>
+                <strong><%= user.display_name || user.username %></strong>
+                <span>@<%= user.username %></span>
+              </td>
+              <td>
+                <span class="status-chip <%= user.role === "admin" ? "admin" : "" %>">
+                  <%= user.role %>
+                </span>
+              </td>
+              <td>
+                <% if (user.is_banned) { %>
+                  <span class="status-chip danger">banned</span>
+                  <% if (user.banned_reason) { %>
+                    <small><%= user.banned_reason %></small>
+                  <% } %>
+                <% } else { %>
+                  <span class="status-chip good">active</span>
+                <% } %>
+              </td>
+              <td><%= user.message_count %></td>
+              <td><%= user.last_seen_at ? formatDateTime(user.last_seen_at) : "Never" %></td>
+              <td>
+                <div class="admin-actions">
+                  <% if (user.role === "admin") { %>
+                    <form action="/admin/users/<%= user.id %>/demote" method="POST">
+                      <button class="button secondary" type="submit" <%= user.id === currentUser.id ? "disabled" : "" %>>Demote</button>
+                    </form>
+                  <% } else { %>
+                    <form action="/admin/users/<%= user.id %>/promote" method="POST">
+                      <button class="button secondary" type="submit">Promote</button>
+                    </form>
+                  <% } %>
+
+                  <% if (user.is_banned) { %>
+                    <form action="/admin/users/<%= user.id %>/unban" method="POST">
+                      <button class="button secondary" type="submit">Unban</button>
+                    </form>
+                  <% } else { %>
+                    <form class="inline-reason-form" action="/admin/users/<%= user.id %>/ban" method="POST">
+                      <input name="reason" placeholder="reason">
+                      <button class="button danger" type="submit" <%= user.id === currentUser.id ? "disabled" : "" %>>Ban</button>
+                    </form>
+                  <% } %>
+
+                  <form action="/admin/users/<%= user.id %>/delete" method="POST">
+                    <button class="button danger" type="submit" <%= user.id === currentUser.id ? "disabled" : "" %>>Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="admin-grid">
+    <div class="admin-section">
+      <div class="admin-section-head">
+        <div>
+          <p class="eyebrow">Structure</p>
+          <h2>Channels</h2>
+        </div>
+      </div>
+
+      <div class="admin-list">
+        <% channels.forEach((channel) => { %>
+          <article class="admin-list-row">
+            <div>
+              <strong># <%= channel.name %></strong>
+              <span><%= channel.description || "No description" %></span>
+              <small><%= channel.message_count %> messages, <%= channel.attachment_count %> attachments</small>
+            </div>
+            <form action="/admin/channels/<%= channel.id %>/delete" method="POST">
+              <button class="button danger" type="submit">Delete</button>
+            </form>
+          </article>
+        <% }) %>
+      </div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-head">
+        <div>
+          <p class="eyebrow">Audit</p>
+          <h2>Recent Messages</h2>
+        </div>
+      </div>
+
+      <div class="admin-list">
+        <% recentMessages.forEach((message) => { %>
+          <article class="admin-list-row">
+            <div>
+              <strong><%= message.display_name || message.username %></strong>
+              <span># <%= message.channel_name %> · <%= formatDateTime(message.created_at) %></span>
+              <small><%= message.content || "Attachment only" %></small>
+            </div>
+            <form action="/admin/messages/<%= message.id %>/delete" method="POST">
+              <button class="button danger" type="submit">Delete</button>
+            </form>
+          </article>
+        <% }) %>
+
+        <% if (recentMessages.length === 0) { %>
+          <p class="muted">No messages yet.</p>
+        <% } %>
+      </div>
+    </div>
+  </section>
+</main>

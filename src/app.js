@@ -8,6 +8,7 @@ const createPgSession = require("connect-pg-simple");
 const pool = require("./db/pool");
 const { flashMiddleware } = require("./middleware/flash");
 const { loadCurrentUser } = require("./middleware/auth");
+const adminRoutes = require("./routes/adminRoutes");
 const attachmentRoutes = require("./routes/attachmentRoutes");
 const authRoutes = require("./routes/authRoutes");
 const channelRoutes = require("./routes/channelRoutes");
@@ -75,6 +76,7 @@ app.use((req, res, next) => {
 
 app.use(healthRoutes);
 app.use(authRoutes);
+app.use(adminRoutes);
 app.use(channelRoutes);
 app.use(messageRoutes);
 app.use(attachmentRoutes);

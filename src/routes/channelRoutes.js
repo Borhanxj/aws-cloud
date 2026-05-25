@@ -161,7 +161,8 @@ router.get("/channels/:channelId/messages.json", requireAuth, async (req, res, n
     res.json({
       messages,
       count: messages.length,
-      currentUserId: req.currentUser.id
+      currentUserId: req.currentUser.id,
+      currentUserRole: req.currentUser.role
     });
   } catch (error) {
     next(error);

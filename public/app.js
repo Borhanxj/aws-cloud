@@ -8,6 +8,7 @@
 
   const channelId = messageList.dataset.channelId;
   const currentUserId = Number(messageList.dataset.currentUserId);
+  const currentUserRole = messageList.dataset.currentUserRole;
   const messageCount = document.querySelector("[data-message-count]");
   const fileInput = composer.querySelector('input[type="file"]');
   const preview = composer.querySelector("[data-attachment-preview]");
@@ -113,18 +114,27 @@
   }
 
   function renderMessageTools(message) {
-    if (Number(message.user_id) !== currentUserId) {
+    const isOwner = Number(message.user_id) === currentUserId;
+    const isAdmin = currentUserRole === "admin";
+
+    if (!isOwner && !isAdmin) {
       return "";
     }
 
     return `
       <details class="message-tools">
         <summary>Manage</summary>
-        <form action="/messages/${message.id}/edit" method="POST">
-          <input type="hidden" name="channel_id" value="${channelId}">
-          <textarea name="content" required>${escapeHtml(message.content)}</textarea>
-          <button class="button secondary" type="submit">Save</button>
-        </form>
+        ${
+          isOwner
+            ? `
+              <form action="/messages/${message.id}/edit" method="POST">
+                <input type="hidden" name="channel_id" value="${channelId}">
+                <textarea name="content" required>${escapeHtml(message.content)}</textarea>
+                <button class="button secondary" type="submit">Save</button>
+              </form>
+            `
+            : ""
+        }
         <form action="/messages/${message.id}/delete" method="POST">
           <input type="hidden" name="channel_id" value="${channelId}">
           <button class="button danger" type="submit">Delete</button>

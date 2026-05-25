@@ -42,6 +42,11 @@ AWS_REGION=us-east-1
 S3_BUCKET_NAME=
 SECRET_NAME=
 MAX_UPLOAD_MB=20
+
+ADMIN_USERNAME=cloud_admin
+ADMIN_PASSWORD=change-this-admin-password
+ADMIN_DISPLAY_NAME=Cloud Admin
+ADMIN_EMAIL=admin@example.com
 ```
 
 Create the local PostgreSQL database:
@@ -82,3 +87,7 @@ S3_BUCKET_NAME=your-private-attachments-bucket
 ```
 
 In AWS mode, uploaded attachments are saved in S3 and served back through authenticated app routes.
+
+To bootstrap the first admin account, set `ADMIN_USERNAME` and `ADMIN_PASSWORD`
+in `.env`, then restart the app. The app will create or update that account as
+an admin during startup.

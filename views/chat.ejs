@@ -1,6 +1,9 @@
 <div class="app-shell">
   <nav class="server-rail" aria-label="Server navigation">
     <a class="server-badge active" href="/">CC</a>
+    <% if (currentUser.role === "admin") { %>
+      <a class="server-badge quiet" href="/admin" title="Admin console">AD</a>
+    <% } %>
   </nav>
 
   <aside class="channel-sidebar">
@@ -70,6 +73,7 @@
         data-message-list
         data-channel-id="<%= selectedChannel.id %>"
         data-current-user-id="<%= currentUser.id %>"
+        data-current-user-role="<%= currentUser.role %>"
       >
         <% if (messages.length === 0) { %>
           <div class="empty-chat">
@@ -112,14 +116,16 @@
                 <% } %>
               <% } %>
 
-              <% if (message.user_id === currentUser.id) { %>
+              <% if (message.user_id === currentUser.id || currentUser.role === "admin") { %>
                 <details class="message-tools">
                   <summary>Manage</summary>
-                  <form action="/messages/<%= message.id %>/edit" method="POST">
-                    <input type="hidden" name="channel_id" value="<%= selectedChannel.id %>">
-                    <textarea name="content" required><%= message.content %></textarea>
-                    <button class="button secondary" type="submit">Save</button>
-                  </form>
+                  <% if (message.user_id === currentUser.id) { %>
+                    <form action="/messages/<%= message.id %>/edit" method="POST">
+                      <input type="hidden" name="channel_id" value="<%= selectedChannel.id %>">
+                      <textarea name="content" required><%= message.content %></textarea>
+                      <button class="button secondary" type="submit">Save</button>
+                    </form>
+                  <% } %>
                   <form action="/messages/<%= message.id %>/delete" method="POST">
                     <input type="hidden" name="channel_id" value="<%= selectedChannel.id %>">
                     <button class="button danger" type="submit">Delete</button>

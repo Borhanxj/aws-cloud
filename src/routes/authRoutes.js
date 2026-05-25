@@ -118,7 +118,7 @@ router.post("/login", redirectIfAuthenticated, async (req, res, next) => {
 
     const result = await pool.query(
       `
-      SELECT id, password_hash
+      SELECT id, password_hash, is_banned
       FROM users_app
       WHERE username = $1
       `,
@@ -131,6 +131,11 @@ router.post("/login", redirectIfAuthenticated, async (req, res, next) => {
 
     if (!validPassword) {
       req.flash("error", "Invalid username or password.");
+      return res.redirect("/login");
+    }
+
+    if (user.is_banned) {
+      req.flash("error", "This account is banned.");
       return res.redirect("/login");
     }
 

@@ -155,15 +155,19 @@ router.post("/messages/:messageId/delete", requireAuth, async (req, res, next) =
 
     const ownershipResult = await client.query(
       `
-      SELECT id
+      SELECT id, user_id
       FROM messages
       WHERE id = $1
-        AND user_id = $2
       `,
-      [messageId, req.currentUser.id]
+      [messageId]
     );
 
-    if (ownershipResult.rows.length === 0) {
+    const message = ownershipResult.rows[0];
+    const canDelete =
+      message &&
+      (message.user_id === req.currentUser.id || req.currentUser.role === "admin");
+
+    if (!canDelete) {
       await client.query("ROLLBACK");
       req.flash("error", "You can only delete your own messages.");
       return res.redirect(`/channels/${channelId}`);
