@@ -1,0 +1,178 @@
+<div class="app-shell">
+  <nav class="server-rail" aria-label="Server navigation">
+    <a class="server-badge active" href="/">CC</a>
+    <a class="server-badge quiet" href="/health" title="Health check">OK</a>
+  </nav>
+
+  <aside class="channel-sidebar">
+    <header class="workspace-header">
+      <div>
+        <p class="eyebrow">Workspace</p>
+        <h1>CloudChat</h1>
+      </div>
+      <span class="mode-pill"><%= mode %></span>
+    </header>
+
+    <section class="server-meta">
+      <span>Server</span>
+      <strong><%= serverName %></strong>
+    </section>
+
+    <section class="channel-section">
+      <div class="section-title">Channels</div>
+      <div class="channel-list">
+        <% channels.forEach((channel) => { %>
+          <a class="channel-link <%= selectedChannel && selectedChannel.id === channel.id ? "active" : "" %>" href="/channels/<%= channel.id %>">
+            <span>#</span>
+            <strong><%= channel.name %></strong>
+            <small><%= channel.message_count %></small>
+          </a>
+        <% }) %>
+      </div>
+    </section>
+
+    <form class="channel-form" action="/channels" method="POST">
+      <input name="name" placeholder="new-channel" required>
+      <input name="description" placeholder="description">
+      <button class="button secondary" type="submit">Create</button>
+    </form>
+
+    <section class="current-user">
+      <div class="avatar" style="background:<%= currentUser.avatar_color %>">
+        <%= getInitials(currentUser.display_name || currentUser.username) %>
+      </div>
+      <div>
+        <strong><%= currentUser.display_name || currentUser.username %></strong>
+        <span>@<%= currentUser.username %></span>
+      </div>
+      <form action="/logout" method="POST">
+        <button class="icon-button" type="submit" title="Sign out">Exit</button>
+      </form>
+    </section>
+  </aside>
+
+  <main class="chat-main">
+    <% if (selectedChannel) { %>
+      <header class="chat-header">
+        <div>
+          <p class="eyebrow">Channel</p>
+          <h2># <%= selectedChannel.name %></h2>
+          <p><%= selectedChannel.description || "No description yet." %></p>
+        </div>
+        <div class="header-stat">
+          <span>Messages</span>
+          <strong><%= messages.length %></strong>
+        </div>
+      </header>
+
+      <section class="message-list" aria-label="Messages">
+        <% if (messages.length === 0) { %>
+          <div class="empty-chat">
+            <div class="brand-mark">#</div>
+            <h3># <%= selectedChannel.name %></h3>
+            <p>No messages yet.</p>
+          </div>
+        <% } %>
+
+        <% messages.forEach((message) => { %>
+          <article class="message">
+            <div class="avatar" style="background:<%= message.avatar_color %>">
+              <%= getInitials(message.display_name || message.username) %>
+            </div>
+
+            <div class="message-body">
+              <div class="message-head">
+                <strong><%= message.display_name || message.username %></strong>
+                <span><%= formatDateTime(message.created_at) %></span>
+                <% if (message.updated_at) { %>
+                  <span>edited</span>
+                <% } %>
+              </div>
+
+              <% if (message.content) { %>
+                <p class="message-text"><%= message.content %></p>
+              <% } %>
+
+              <% if (message.attachment_id) { %>
+                <% if (message.content_type && message.content_type.startsWith("image/")) { %>
+                  <a class="image-attachment" href="<%= message.attachment_url %>" target="_blank">
+                    <img src="<%= message.attachment_url %>" alt="<%= message.file_name %>">
+                  </a>
+                <% } else { %>
+                  <a class="file-attachment" href="<%= message.attachment_url %>" target="_blank">
+                    <span>File</span>
+                    <strong><%= message.file_name %></strong>
+                    <small><%= formatFileSize(message.file_size) %></small>
+                  </a>
+                <% } %>
+              <% } %>
+
+              <% if (message.user_id === currentUser.id) { %>
+                <details class="message-tools">
+                  <summary>Manage</summary>
+                  <form action="/messages/<%= message.id %>/edit" method="POST">
+                    <input type="hidden" name="channel_id" value="<%= selectedChannel.id %>">
+                    <textarea name="content" required><%= message.content %></textarea>
+                    <button class="button secondary" type="submit">Save</button>
+                  </form>
+                  <form action="/messages/<%= message.id %>/delete" method="POST">
+                    <input type="hidden" name="channel_id" value="<%= selectedChannel.id %>">
+                    <button class="button danger" type="submit">Delete</button>
+                  </form>
+                </details>
+              <% } %>
+            </div>
+          </article>
+        <% }) %>
+      </section>
+
+      <form class="composer" action="/channels/<%= selectedChannel.id %>/messages" method="POST" enctype="multipart/form-data">
+        <textarea name="content" placeholder="Message #<%= selectedChannel.name %>"></textarea>
+        <label class="file-picker">
+          <input type="file" name="attachment">
+          <span>Attach</span>
+        </label>
+        <button class="button primary" type="submit">Send</button>
+      </form>
+    <% } else { %>
+      <section class="empty-state">
+        <div class="brand-mark">CC</div>
+        <h2>No channels yet</h2>
+        <p>Create a channel to start chatting.</p>
+      </section>
+    <% } %>
+  </main>
+
+  <aside class="member-sidebar">
+    <section>
+      <div class="section-title">Active Members</div>
+      <div class="member-list">
+        <% members.forEach((member) => { %>
+          <div class="member">
+            <div class="avatar small" style="background:<%= member.avatar_color %>">
+              <%= getInitials(member.display_name || member.username) %>
+            </div>
+            <div>
+              <strong><%= member.display_name || member.username %></strong>
+              <span>@<%= member.username %></span>
+            </div>
+          </div>
+        <% }) %>
+
+        <% if (members.length === 0) { %>
+          <p class="muted">No activity yet.</p>
+        <% } %>
+      </div>
+    </section>
+
+    <section class="stack-card">
+      <div class="section-title">Project Stack</div>
+      <ul>
+        <li>Express routes</li>
+        <li>PostgreSQL sessions</li>
+        <li>bcrypt login</li>
+        <li>Local uploads</li>
+      </ul>
+    </section>
+  </aside>
+</div>

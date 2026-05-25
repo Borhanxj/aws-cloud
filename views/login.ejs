@@ -1,0 +1,46 @@
+<main class="auth-shell">
+  <section class="auth-panel">
+    <div class="brand-row">
+      <div class="brand-mark">CC</div>
+      <div>
+        <p class="eyebrow">CloudChat</p>
+        <h1>Sign in</h1>
+      </div>
+    </div>
+
+    <form class="auth-form" action="/login" method="POST">
+      <label>
+        <span>Username</span>
+        <input name="username" value="<%= form.username %>" autocomplete="username" required autofocus>
+      </label>
+
+      <label>
+        <span>Password</span>
+        <input name="password" type="password" autocomplete="current-password" required>
+      </label>
+
+      <button class="button primary" type="submit">Sign in</button>
+    </form>
+
+    <p class="auth-switch">
+      New here? <a href="/register">Create an account</a>
+    </p>
+  </section>
+
+  <aside class="auth-aside">
+    <div class="status-grid">
+      <div>
+        <span>Mode</span>
+        <strong><%= mode %></strong>
+      </div>
+      <div>
+        <span>Server</span>
+        <strong><%= serverName %></strong>
+      </div>
+      <div>
+        <span>Stack</span>
+        <strong>Express + PostgreSQL</strong>
+      </div>
+    </div>
+  </aside>
+</main>

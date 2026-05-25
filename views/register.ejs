@@ -1,0 +1,56 @@
+<main class="auth-shell">
+  <section class="auth-panel">
+    <div class="brand-row">
+      <div class="brand-mark">CC</div>
+      <div>
+        <p class="eyebrow">CloudChat</p>
+        <h1>Create account</h1>
+      </div>
+    </div>
+
+    <form class="auth-form" action="/register" method="POST">
+      <label>
+        <span>Username</span>
+        <input name="username" value="<%= form.username %>" autocomplete="username" required autofocus>
+      </label>
+
+      <label>
+        <span>Display name</span>
+        <input name="display_name" value="<%= form.displayName %>" autocomplete="name">
+      </label>
+
+      <label>
+        <span>Email</span>
+        <input name="email" type="email" value="<%= form.email %>" autocomplete="email">
+      </label>
+
+      <label>
+        <span>Password</span>
+        <input name="password" type="password" autocomplete="new-password" required>
+      </label>
+
+      <button class="button primary" type="submit">Create account</button>
+    </form>
+
+    <p class="auth-switch">
+      Already registered? <a href="/login">Sign in</a>
+    </p>
+  </section>
+
+  <aside class="auth-aside">
+    <div class="status-grid">
+      <div>
+        <span>Authentication</span>
+        <strong>bcrypt + sessions</strong>
+      </div>
+      <div>
+        <span>Session store</span>
+        <strong>PostgreSQL</strong>
+      </div>
+      <div>
+        <span>Uploads</span>
+        <strong>Local now, S3 later</strong>
+      </div>
+    </div>
+  </aside>
+</main>
