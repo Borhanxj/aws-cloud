@@ -84,6 +84,9 @@ async function initializeDatabase() {
         WHERE table_name = 'attachments'
           AND column_name = 's3_key'
       ) THEN
+        ALTER TABLE attachments
+        ALTER COLUMN s3_key DROP NOT NULL;
+
         UPDATE attachments
         SET storage_key = s3_key
         WHERE storage_key IS NULL
