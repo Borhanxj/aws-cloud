@@ -171,7 +171,7 @@
         <li>Express routes</li>
         <li>PostgreSQL sessions</li>
         <li>bcrypt login</li>
-        <li>Local uploads</li>
+        <li><%= mode === "aws" ? "S3 attachments" : "Local uploads" %></li>
       </ul>
     </section>
   </aside>

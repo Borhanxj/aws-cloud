@@ -10,6 +10,7 @@ The local version includes:
 - Channel list and channel creation
 - Message sending, editing, and deleting
 - File attachments saved locally in `uploads/`
+- S3-backed private attachments in AWS mode
 - Health endpoint for load balancer checks
 - Server name display for EC2/ALB testing
 
@@ -40,6 +41,7 @@ SERVER_NAME=local-dev-server
 AWS_REGION=us-east-1
 S3_BUCKET_NAME=
 SECRET_NAME=
+MAX_UPLOAD_MB=20
 ```
 
 Create the local PostgreSQL database:
@@ -75,6 +77,8 @@ For RDS PostgreSQL, use SSL:
 ```env
 APP_MODE=aws
 DB_SSL=true
+AWS_REGION=eu-west-1
+S3_BUCKET_NAME=your-private-attachments-bucket
 ```
 
-This project currently runs the non-cloud application logic. The code keeps separate service files so S3 and Secrets Manager can be connected cleanly later.
+In AWS mode, uploaded attachments are saved in S3 and served back through authenticated app routes.

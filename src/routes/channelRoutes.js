@@ -2,7 +2,6 @@ const express = require("express");
 
 const pool = require("../db/pool");
 const { requireAuth } = require("../middleware/auth");
-const { getPublicUrl } = require("../services/storageService");
 const { renderPage } = require("../utils/render");
 const { slugifyChannelName } = require("../utils/text");
 
@@ -67,7 +66,9 @@ async function getMessages(channelId) {
 
   return result.rows.map((message) => ({
     ...message,
-    attachment_url: getPublicUrl(message.storage_key)
+    attachment_url: message.attachment_id
+      ? `/attachments/${message.attachment_id}`
+      : ""
   }));
 }
 

@@ -1,16 +1,19 @@
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
+const multer = require("multer");
 const session = require("express-session");
 const createPgSession = require("connect-pg-simple");
 
 const pool = require("./db/pool");
 const { flashMiddleware } = require("./middleware/flash");
 const { loadCurrentUser } = require("./middleware/auth");
+const attachmentRoutes = require("./routes/attachmentRoutes");
 const authRoutes = require("./routes/authRoutes");
 const channelRoutes = require("./routes/channelRoutes");
 const healthRoutes = require("./routes/healthRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+const { maxUploadMb } = require("./services/storageService");
 const { formatDateTime, formatFileSize, getInitials } = require("./utils/text");
 
 const app = express();
@@ -74,6 +77,7 @@ app.use(healthRoutes);
 app.use(authRoutes);
 app.use(channelRoutes);
 app.use(messageRoutes);
+app.use(attachmentRoutes);
 
 app.use((req, res) => {
   res.status(404).render("layout", {
@@ -92,6 +96,17 @@ app.use((req, res) => {
 
 app.use((error, req, res, next) => {
   console.error(error);
+
+  if (error instanceof multer.MulterError) {
+    if (error.code === "LIMIT_FILE_SIZE") {
+      req.flash("error", `File is too large. Max upload is ${maxUploadMb} MB.`);
+      return res.redirect(req.get("Referrer") || "/");
+    }
+
+    req.flash("error", "Upload failed. Try a different file.");
+    return res.redirect(req.get("Referrer") || "/");
+  }
+
   res.status(500).render("layout", {
     pageTitle: "Application error - CloudChat",
     bodyClass: "auth-page",
