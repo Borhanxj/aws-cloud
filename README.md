@@ -32,6 +32,7 @@ DB_PORT=5432
 DB_NAME=discord_local
 DB_USER=postgres
 DB_PASSWORD=your-local-postgres-password
+DB_SSL=false
 
 SESSION_SECRET=change-this-local-session-secret
 SERVER_NAME=local-dev-server
@@ -68,5 +69,12 @@ http://localhost:3000/health
 ## Production Notes
 
 For EC2 deployment, each instance should have its own `.env` file. Use the same GitHub code on both servers, but set a different `SERVER_NAME` on each instance so the ALB can prove traffic is reaching both targets.
+
+For RDS PostgreSQL, use SSL:
+
+```env
+APP_MODE=aws
+DB_SSL=true
+```
 
 This project currently runs the non-cloud application logic. The code keeps separate service files so S3 and Secrets Manager can be connected cleanly later.
